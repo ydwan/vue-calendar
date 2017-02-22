@@ -298,11 +298,11 @@
             begin: {
                 type: String,
                 twoWay: true,
-                default: "2016-11-10"
+                default: ""
             },
             end: {
                 type: String,
-                default: "2018-12-10"
+                default: ""
             },
             //起始值
             value: {
