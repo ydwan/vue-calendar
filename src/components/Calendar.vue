@@ -583,7 +583,7 @@
                     }
                     else if (this.selectValue.start) {
                         this.selectValue.end = value;
-                        //如果第一个选择的时间
+                        //如果第一个选择的时间小于第二个时间,将开始和结束时间对调
                         if (moment(value) < moment(this.selectValue.start)) {
                             this.selectValue.end = this.selectValue.start;
                             this.selectValue.start = value;
