@@ -42,11 +42,7 @@
                 }
             }
         },
-        // 处理值的传递
         watch: {
-            'calendar.value': function (value) {
-                this.calendar.items[this.calendar.picker].value = value
-            }
         },
         methods: {
             // 打开显示选择器

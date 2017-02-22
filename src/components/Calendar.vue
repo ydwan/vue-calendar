@@ -617,7 +617,7 @@
             getCssClass(value, cssClass) {
                 var _self = this;
                 var newcssClass = {};
-                var selects = [], type = "";
+                var selects = this.selects || [], type = "";
                 switch (this.currentViewType.text) {
                     case "decade":
                         type = 'years';
@@ -631,9 +631,12 @@
                         break;
                 }
                 value = this.formatViewTypeDate(value, type);
-                selects = this.removeRedundancy(this.selects, value, type);
+                if (!_self.single) {
+                    selects = this.removeRedundancy(this.selects, value, type);
+                }
                 selects = selects.map(c => _self.formatViewTypeDate(c, type));
                 selects = unique(selects);
+
                 var index = selects.indexOf(value);
                 if (index >= 0) {
                     newcssClass.selected = true;
@@ -688,7 +691,12 @@
                 var dateSplit = date.split('-');
                 var field = date;
                 switch (type) {
+                    case 'months':
+                        //匹配年份:2017
+                        field = dateSplit[0];
+                        break;
                     case 'days':
+                        //匹配年份+月份:2017-02
                         field = dateSplit[0] + '-' + dateSplit[1];
                         break;
                 }
