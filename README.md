@@ -3,6 +3,13 @@
 
 ##感谢jinzhe的项目vue-calendar，此项目是根据jinzhe的样式上完成
 
+##项目示例
+<p>单一时间</p>
+![image](https://github.com/ydwan/vue-calendar/blob/master/resource/single.png)
+
+<p>区间时间</p>
+![image](https://github.com/ydwan/vue-calendar/blob/master/resource/range.png)
+
 ##运行方式:
 <p><code>npm i</code>加载依赖</p>
 <p><code>npm run dev</code>跑测试端口,届时浏览器会自动打开并进入页面<a href='http://localhost:8080/'>http://localhost:8080/</a></p>
