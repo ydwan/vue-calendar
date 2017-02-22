@@ -583,6 +583,11 @@
                     }
                     else if (this.selectValue.start) {
                         this.selectValue.end = value;
+                        //如果第一个选择的时间
+                        if (moment(value) < moment(this.selectValue.start)) {
+                            this.selectValue.end = this.selectValue.start;
+                            this.selectValue.start = value;
+                        }
                         this.selects = this.getRangeDate(this.selectValue.start, this.selectValue.end, this.currentViewType.text);
                     }
                 }
