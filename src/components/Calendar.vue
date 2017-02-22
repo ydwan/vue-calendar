@@ -685,7 +685,7 @@
                     timeSwitch.push(mm.month() + 1);
                     timeSwitch.push(Number(mm.format("DD")) + 1);
                 }
-                return timeSwitch.join(this.sep);
+                return timeSwitch.join('/');
             },
             //根据传入时间和类型将数组冗余数据剔除,,
             //@param{Array}  arr:[2016-01-02,2016-02-03]
