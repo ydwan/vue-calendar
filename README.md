@@ -3,12 +3,12 @@
 
 ## 感谢jinzhe的项目vue-calendar，此项目是根据jinzhe的样式上完成
 
-## 项目示例
-<p>单一时间</p>
-![image](https://github.com/ydwan/vue-calendar/blob/master/resource/single.png)
+## 项目实现效果
+### 单一时间</p>
+![单一时间](https://github.com/ydwan/vue-calendar/blob/master/resource/single.png "单一时间")
 
-<p>区间时间</p>
-![image](https://github.com/ydwan/vue-calendar/blob/master/resource/range.png)
+### 区间时间
+![区间时间](https://github.com/ydwan/vue-calendar/blob/master/resource/range.png "区间时间")
 
 ## 运行方式:
 <p><code>npm i</code>加载依赖</p>
