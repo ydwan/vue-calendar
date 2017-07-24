@@ -11,6 +11,9 @@
       <li>
         <router-link to="/singleTime">查看单一选择器</router-link>
       </li>
+      <li>
+        <router-link to="/pager">Pager组件</router-link>
+      </li>
     </ul>
   </div>
 </template>
