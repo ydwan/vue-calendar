@@ -1,13 +1,29 @@
 <style scoped>
+@import '../assets/css/font-awesome.min.css';
 .calendar {
+    z-index: 999999;
     width: 300px;
     padding: 10px;
     background: #fff;
     position: absolute;
     border: 1px solid #DEDEDE;
     border-radius: 2px;
-    opacity: .95;
+    /* opacity:.95; */
     transition: all .5s ease;
+
+    -webkit-touch-callout: none;
+    /* iOS Safari */
+    -webkit-user-select: none;
+    /* Chrome/Safari/Opera */
+    -khtml-user-select: none;
+    /* Konqueror */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer/Edge */
+    user-select: none;
+    /* Non-prefixed version, currently
+not supported by any browser */
 }
 
 .calendar-enter,
@@ -64,11 +80,11 @@
 }
 
 .calendar-prev {
-    float: left;
+    float: left !important;
 }
 
 .calendar-next {
-    float: right;
+    float: right !important;
 }
 
 .calendar table {
@@ -199,6 +215,24 @@
     text-align: center;
 }
 
+.calendar-operate-btns {
+    min-width: 30px;
+    min-height: 30px;
+}
+
+.calendar-operate-btns:hover {
+    background-color: #f3f8fa;
+}
+
+
+.calendar-time-switch {
+    padding: 5px 20px;
+}
+
+.calendar-time-switch:hover {
+    background-color: #f3f8fa;
+}
+
 .calendar-button span {
     cursor: pointer;
     display: inline-block;
@@ -241,57 +275,32 @@
 .calendar td.selected .lunar {
     color: #fff;
 }
-
-@font-face {
-    font-family: 'Glyphicons Halflings';
-    src: url('../../static/fonts/glyphicons-halflings-regular.eot');
-    src: url('../../static/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../../static/fonts/glyphicons-halflings-regular.woff2') format('woff2'), url('../../static/fonts/glyphicons-halflings-regular.woff') format('woff'), url('../../static/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../../static/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
-}
-
-.glyphicon {
-    position: relative;
-    top: 1px;
-    display: inline-block;
-    font-family: 'Glyphicons Halflings';
-    font-style: normal;
-    font-weight: normal;
-    line-height: 1;
-
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-.glyphicon-menu-left:before {
-    content: "\e257";
-}
-
-.glyphicon-menu-right:before {
-    content: "\e258";
-}
 </style>
 
 <template>
-    <div @click.stop="" class="calendar" v-show="show" :style="{'left':x+'px','top':y+'px'}" transition="calendar" transition-mode="out-in">
+    <div class="calendar" v-show="show" :style="{'left':x+'px','top':y+'px'}" transition="calendar" transition-mode="out-in">
         <div class="calendar-tools">
-            <span class="calendar-prev" @click="prev">
-                <i class="glyphicon glyphicon-menu-left"></i>
+            <span class="calendar-operate-btns calendar-prev" @click="prev">
+                <i class="fa fa-angle-left"></i>
             </span>
-            <span class="calendar-next" @click="next">
-                <i class="glyphicon glyphicon-menu-right"></i>
+            <span class="calendar-operate-btns calendar-next" @click="next">
+                <i class="fa fa-angle-right"></i>
             </span>
-            <div style="text-align: center;cursor: pointer;" @click.stop="setPrevTimeSwitch">{{timeSwitch}}</div>
+            <div style="width:auto;">
+                <span @click.stop="setPrevTimeSwitch" class="calendar-time-switch">{{timeSwitch}}</span>
+            </div>
         </div>
         <table>
             <thead>
                 <tr v-if="list.head.length>0">
-                    <td v-for="item in list.head">
+                    <td v-for="item in list.head" :key="'head'+item">
                         <span>{{item}}</span>
                     </td>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="item in list.body">
-                    <td v-for="td in item" @click.stop="select(td.value)" :class="getCssClass(td.value,td.cssClass)">
+                <tr v-for="(item,index) in list.body" :key="'body'+index">
+                    <td v-for="td in item" @click.stop="select(td.value)" :class="getCssClass(td.value,td.cssClass)" :key="td.value">
                         <span>{{td.text}}</span>
                     </td>
                 </tr>
@@ -308,6 +317,7 @@
 import moment from 'moment'
 
 export default {
+    name: 'Calendar',
     props: {
         show: {
             type: Boolean,
@@ -355,6 +365,18 @@ export default {
             type: String,
             default: ""
         },
+        //可用列表启用
+        usableEnable: {
+            type: Boolean,
+            default: false
+        },
+        //可用列表,假设['2017-07-01'],那么只有这个日期可选择，其他都为灰色
+        usableList: {
+            type: Array,
+            default() {
+                return []
+            }
+        },
         //起始值
         value: {
             type: String,
@@ -378,26 +400,26 @@ export default {
         },
         weeksWording: {
             type: Array,
-            default: function () {
+            default: function() {
                 return ['日', '一', '二', '三', '四', '五', '六']
             }
         },
         monthsWording: {
             type: Array,
-            default: function () {
+            default: function() {
                 return [
-                    { text: '一月', value: 0 },
-                    { text: '二月', value: 1 },
-                    { text: '三月', value: 2 },
-                    { text: '四月', value: 3 },
-                    { text: '五月', value: 4 },
-                    { text: '六月', value: 5 },
-                    { text: '七月', value: 6 },
-                    { text: '八月', value: 7 },
-                    { text: '九月', value: 8 },
-                    { text: '十月', value: 9 },
-                    { text: '十一月', value: 10 },
-                    { text: '十二月', value: 11 }
+                    { text: '1 月', value: 0 },
+                    { text: '2 月', value: 1 },
+                    { text: '3 月', value: 2 },
+                    { text: '4 月', value: 3 },
+                    { text: '5 月', value: 4 },
+                    { text: '6 月', value: 5 },
+                    { text: '7 月', value: 6 },
+                    { text: '8 月', value: 7 },
+                    { text: '9 月', value: 8 },
+                    { text: '10 月', value: 9 },
+                    { text: '11 月', value: 10 },
+                    { text: '12 月', value: 11 }
                 ];
             }
         }
@@ -500,8 +522,8 @@ export default {
                     type = 'days';
                     break;
             }
-            var startMM = moment(start).endOf(type);
-            var endMM = moment(end).endOf(type);
+            var startMM = moment(new Date(start)).endOf(type);
+            var endMM = moment(new Date(end)).endOf(type);
             while (startMM <= endMM) {
                 result.push(startMM.format('YYYY-MM-DD'));
                 startMM.add(1, type);
@@ -635,7 +657,7 @@ export default {
                 else if (this.selectValue.start) {
                     this.selectValue.end = value;
                     //如果第一个选择的时间小于第二个时间,将开始和结束时间对调
-                    if (moment(value) < moment(this.selectValue.start)) {
+                    if (moment(new Date(value)) < moment(new Date(this.selectValue.start))) {
                         this.selectValue.end = this.selectValue.start;
                         this.selectValue.start = value;
                     }
@@ -736,7 +758,7 @@ export default {
                 timeSwitch.push(mm.month() + 1);
                 timeSwitch.push(Number(mm.format("DD")) + 1);
             }
-            return timeSwitch.join('/');
+            return timeSwitch.join('.');
         },
         //根据传入时间和类型将数组冗余数据剔除,,
         //@param{Array}  arr:[2016-01-02,2016-02-03]
@@ -749,7 +771,7 @@ export default {
             switch (type) {
                 //如果是年份将数组中所有日期转换为当年的最后一天,2016-10-12=>2016-12-31;
                 case 'years':
-                    arr = arr.map(c => moment(c).endOf('year').format('YYYY-MM-DD'));
+                    arr = arr.map(c => moment(new Date(c)).endOf('year').format('YYYY-MM-DD'));
                     break;
                 case 'months':
                     //匹配年份:2017
@@ -798,6 +820,37 @@ export default {
         //@return {Array} body(添加disable样式)集合
         setDisableCssClass(arr) {
             var _self = this;
+            //有自己的可用列表
+            if (_self.usableEnable) {
+                return arr.map(c => {
+                    var disabled = false;
+                    var mm = moment(new Date(c.value));
+                    if (!c.cssClass) {
+                        c.cssClass = {};
+                    }
+                    //判断当前c的时间是否存在于可点击事件中，不可点击的设置disabled样式
+                    switch (_self.currentViewType.text) {
+                        case 'decade':
+                            //是否存在
+                            var isExist = _self.usableList.some(usable => moment(new Date(usable)).year() == mm.year());
+                            disabled = !isExist;
+                            break;
+                        case 'year':
+                            var isExist = _self.usableList.some(usable => moment(new Date(usable)).endOf('month').format('YYYY-MM-DD') == mm.endOf('month').format('YYYY-MM-DD'));
+                            disabled = !isExist;
+                            break;
+                        case 'month':
+                            disabled = !_self.usableList.some(usable => usable == mm)
+                            break;
+                    }
+                    return {
+                        text: c.text,
+                        value: c.value,
+                        cssClass: Object.assign(c.cssClass, { disabled })
+                    }
+                });
+            }
+
             var beginMM = null, endMM = null;
             if (this.begin) {
                 beginMM = moment(new Date(this.begin)).add(-1, 'days');
@@ -807,7 +860,7 @@ export default {
             }
             return arr.map(c => {
                 var disabled = false;
-                var mm = moment(c.value);
+                var mm = moment(new Date(c.value));
                 if (!c.cssClass) {
                     c.cssClass = {};
                 }
@@ -867,7 +920,7 @@ var viewTypeEnum = {
 //获取年份总共12个包含当前的年份
 //@param{String,Date} date日期
 //@return{Array} 返回12个年份集合
-var getYearDateBody = function (date) {
+var getYearDateBody = function(date) {
     var mm = moment(new Date(date));
     var year = mm.year();
     var result = [];
@@ -896,7 +949,7 @@ var getYearDateBody = function (date) {
 }
 
 //获取月份的body数据
-var getMonthDateBody = function (date) {
+var getMonthDateBody = function(date) {
     var mm = moment(new Date(date));
     var year = mm.year();
     //moment的month索引从0开始
@@ -947,19 +1000,8 @@ var getMonthDateBody = function (date) {
 //去除数组重复
 //@param{Array} arr数组
 //@return{Array}
-var unique = function (arr) {
-    arr = arr || [];
-    var hash = {}, result = [], type = '', item;
-    for (var i = 0; i < arr.length; i++) {
-        item = arr[i];
-        type = Object.prototype.toString.call(item);
-
-        if (!hash[item + type]) {
-            hash[item + type] = true;
-            result.push(item);
-        }
-    }
-    return result;
+var unique = function(arr) {
+    return [...new Set(arr)];
 }
 
 
@@ -967,7 +1009,7 @@ var unique = function (arr) {
 //@param{Array} arr数组:{cssClass:{},text:'',value:''}
 //@param{Number} length分隔二维数组长度
 //@param{String} formatType格式化时间为当前类型的最后(formatType为:months时 2016-01-18 => 2016-01-31)
-var splitTwoDimension = function (arr, length, formatType) {
+var splitTwoDimension = function(arr, length, formatType) {
     //二维数组
     var result = [];
     //tr行的数据
