@@ -1,5 +1,5 @@
 <style scoped>
-@import '../assets/css/font-awesome.min.css';
+@import '../../assets/css/font-awesome.min.css';
 .calendar {
     z-index: 999999;
     width: 300px;
@@ -123,7 +123,7 @@ not supported by any browser */
 
 .calendar td.disabled {
     color: #c0c0c0;
-    cursor: default !important;
+    cursor: not-allowed !important;
     pointer-events: none !important;
 }
 
@@ -275,40 +275,136 @@ not supported by any browser */
 .calendar td.selected .lunar {
     color: #fff;
 }
+
+.calendar-form {
+    position: relative;
+    display: inline-block;
+    padding: 4px 7px;
+    width: 100%;
+    height: 28px;
+    color: rgba(0, 0, 0, .65);
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    -webkit-transition: all .3s;
+    transition: all .3s;
+}
+
+
+.calendar-form input {
+    background-color: transparent;
+    border: 0;
+    height: 99%;
+    outline: 0;
+    width: 43%;
+    text-align: center;
+    vertical-align: top;
+}
+
+.calendar-form input:focus {
+    outline: none;
+}
+
+.calendar-range-form {
+    position: relative;
+    display: inline-block;
+    padding: 4px 7px;
+    width: 100%;
+    height: 28px;
+    color: rgba(0, 0, 0, .65);
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    -webkit-transition: all .3s;
+    transition: all .3s;
+}
+
+.calendar-range-form input {
+    background-color: transparent;
+    border: 0;
+    height: 99%;
+    outline: 0;
+    width: 43%;
+    text-align: center;
+    vertical-align: top;
+}
+
+.calendar-range-form input:focus {
+    outline: none;
+}
+
+.calendar-range-picker-separator {
+    color: rgba(0, 0, 0, .43);
+    width: 8px;
+    display: inline-block;
+    line-height: 28px;
+    vertical-align: top;
+}
+
+.calendar-picker-icon {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    right: 8px;
+    top: 50%;
+    margin-top: -7px;
+    line-height: 14px;
+    font-size: 12px;
+    -webkit-transition: all .3s;
+    transition: all .3s;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 </style>
 
 <template>
-    <div class="calendar" v-show="show" :style="{'left':x+'px','top':y+'px'}" transition="calendar" transition-mode="out-in">
-        <div class="calendar-tools">
-            <span class="calendar-operate-btns calendar-prev" @click="prev">
-                <i class="fa fa-angle-left"></i>
-            </span>
-            <span class="calendar-operate-btns calendar-next" @click="next">
-                <i class="fa fa-angle-right"></i>
-            </span>
-            <div style="width:auto;">
-                <span @click.stop="setPrevTimeSwitch" class="calendar-time-switch">{{timeSwitch}}</span>
+    <div>
+        <span @click.stop="open($event)" class="calendar-form" v-if="single">
+            <input type="text" :placeholder="placeholder" v-model='currentValue'>
+            <span class="fa fa-calendar calendar-picker-icon" aria-hidden="true"></span>
+        </span>
+        <span v-else @click.stop="open($event)" class="calendar-range-form">
+            <input type="text" :placeholder="placeholder" v-model='currentValue'>
+            <span class="calendar-range-picker-separator">~</span>
+            <input type="text" :placeholder="placeholder" v-model='currentRangeValue'>
+            <span class="fa fa-calendar calendar-picker-icon" aria-hidden="true"></span>
+        </span>
+        <div class="calendar" v-show="show" :style="{'left':x+'px','top':y+'px'}" transition="calendar" transition-mode="out-in">
+            <div class="calendar-tools">
+                <span class="calendar-operate-btns calendar-prev" @click="prev">
+                    <i class="fa fa-angle-left"></i>
+                </span>
+                <span class="calendar-operate-btns calendar-next" @click="next">
+                    <i class="fa fa-angle-right"></i>
+                </span>
+                <div style="width:auto;">
+                    <span @click.stop="setPrevTimeSwitch" class="calendar-time-switch">{{timeSwitch}}</span>
+                </div>
             </div>
-        </div>
-        <table>
-            <thead>
-                <tr v-if="list.head.length>0">
-                    <td v-for="item in list.head" :key="'head'+item">
-                        <span>{{item}}</span>
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(item,index) in list.body" :key="'body'+index">
-                    <td v-for="td in item" @click.stop="select(td.value)" :class="getCssClass(td.value,td.cssClass)" :key="td.value">
-                        <span>{{td.text}}</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="calendar-button" v-if="!autoclose">
-            <span class='submit' @click='ok'>确定</span>
-            <span class='cancel' @click='cancel'>取消</span>
+            <table>
+                <thead>
+                    <tr v-if="list.head.length>0">
+                        <td v-for="item in list.head" :key="'head'+item">
+                            <span>{{item}}</span>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item,index) in list.body" :key="'body'+index">
+                        <td v-for="td in item" @click.stop="select(td.value)" :class="getCssClass(td.value,td.cssClass)" :key="td.value">
+                            <span>{{td.text}}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="calendar-button" v-if="!autoClose">
+                <span class='submit' @click='change'>确定</span>
+                <span class='cancel' @click='cancel'>取消</span>
+            </div>
         </div>
     </div>
 </template>
@@ -319,13 +415,32 @@ import moment from 'moment'
 export default {
     name: 'Calendar',
     props: {
-        show: {
+        //起始值
+        value: {
+            type: String,
+            default: ""
+        },
+        //是否单选(默认单选,false表示为多选，属区间范围)
+        single: {
             type: Boolean,
-            twoWay: true,
-            default: false
+            default: true
+        },
+        //多选第二个值(结束值)
+        rangeValue: {
+            type: String,
+            default: ""
+        },
+        format: {
+            type: String,
+            default: "YYYY-MM-DD"
+        },
+        cssClass: [String, Number, Array, Object],
+        placeholder: {
+            type: String,
+            default: "选择日期"
         },
         //是否自动关闭
-        autoclose: {
+        autoClose: {
             type: Boolean,
             default: true
         },
@@ -343,14 +458,6 @@ export default {
         maxview: {
             type: String,
             default: "decade"
-        },
-        x: {
-            type: Number,
-            default: 0
-        },
-        y: {
-            type: Number,
-            default: 0
         },
         type: {
             type: String,
@@ -376,27 +483,6 @@ export default {
             default() {
                 return []
             }
-        },
-        //起始值
-        value: {
-            type: String,
-            twoWay: true,
-            default: ""
-        },
-        //是否单选(默认单选,false表示为多选，属区间范围)
-        single: {
-            type: Boolean,
-            default: true
-        },
-        //多选第二个值(结束值)
-        rangeValue: {
-            type: String,
-            default: ""
-        },
-        sep: {
-            type: String,
-            twoWay: true,
-            default: "-"
         },
         weeksWording: {
             type: Array,
@@ -426,6 +512,11 @@ export default {
     },
     data() {
         return {
+            show: false,
+            x: 0,
+            y: 0,
+            currentValue: this.value,
+            currentRangeValue: this.rangeValue,
             //用于视图显示头和内容集合
             list: {
                 head: [],
@@ -464,14 +555,24 @@ export default {
         show() {
             this.init()
         },
-        value() {
+        value(newVal) {
+            this.currentValue = newVal;
             this.init()
+        },
+        rangeValue(newVal) {
+            this.currentRangeValue = newVal;
         }
     },
     computed: {
-
     },
     methods: {
+        // 打开显示选择器
+        open(e) {
+            // 设置类型
+            this.show = true
+            this.x = e.currentTarget.offsetLeft
+            this.y = e.currentTarget.offsetTop + e.currentTarget.offsetHeight + 8
+        },
         // 初始化数据
         init() {
             if (this.show) {
@@ -674,21 +775,19 @@ export default {
                 }
             }
             //如果自动关闭
-            if (this.autoclose && this.selectValue.start && this.selectValue.end) {
-                this.ok()
+            if (this.autoClose && this.selectValue.start && this.selectValue.end) {
+                this.change()
             }
         },
         // 多选的时候提交
-        ok() {
-            if (this.sep != '-') {
-                var sep = this.sep;
-                this.selects = this.selects.map(c => (c.replace(/-/g, sep)));
-            }
-            this.$emit('ok', { values: this.selects });
+        change() {
+            this.selects = this.selects.map(c => (moment(new Date(c)).format(this.format)));
+            this.$emit('change', { values: this.selects });
             this.cancel();
         },
         // 隐藏控件
         cancel() {
+            this.show = false;
             this.$emit('cancel', { show: false });
         },
         //获取样式,cssClass为传过来的样式，如果有默认使用传递样式
@@ -751,11 +850,11 @@ export default {
             //显示为month下的视图，将年份、月份添加到顶部中。
             if (currentViewTypeText == "month") {
                 timeSwitch.push(mm.year());
-                timeSwitch.push(mm.month() + 1);
+                timeSwitch.push(mm.format('MM'));
             }
             if (currentViewTypeText == "day") {
                 timeSwitch.push(mm.year());
-                timeSwitch.push(mm.month() + 1);
+                timeSwitch.push(mm.format('MM'));
                 timeSwitch.push(Number(mm.format("DD")) + 1);
             }
             return timeSwitch.join('.');
@@ -871,8 +970,9 @@ export default {
                             disabled = mm.year() < beginMM.year()
                             break;
                         case 'year':
-                            disabled = mm.year() == beginMM.year() && mm.month() < beginMM.month()
+                            disabled = mm.endOf('months') < beginMM.endOf('months')
                             break;
+                        case 'year':
                         case 'month':
                             disabled = mm < beginMM
                             break;
@@ -885,7 +985,7 @@ export default {
                             disabled = mm.year() > endMM.year()
                             break;
                         case 'year':
-                            disabled = mm.year() == beginMM.year() && mm.month() > endMM.month()
+                            disabled = mm.endOf('months') > endMM.endOf('months')
                             break;
                         case 'month':
                             disabled = mm > endMM
@@ -899,6 +999,9 @@ export default {
                 }
             });
         }
+    },
+    mounted() {
+        // this.$slots.text[0];
     }
 }
 
