@@ -5,10 +5,10 @@
 
 ## 项目实现效果
 ### 单一时间</p>
-![单一时间](https://github.com/ydwan/vue-calendar/blob/master/resource/single.png "单一时间")
+![单一时间](https://github.com/ydwan/vue-calendar/blob/master/resource/single.gif "单一时间")
 
 ### 区间时间
-![区间时间](https://github.com/ydwan/vue-calendar/blob/master/resource/range.png "区间时间")
+![区间时间](https://github.com/ydwan/vue-calendar/blob/master/resource/range.gif "区间时间")
 
 ## 运行方式:
 <p><code>npm i</code>加载依赖</p>
