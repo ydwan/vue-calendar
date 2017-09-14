@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Calendar style="width:200px;margin:20px auto;" :value="calendar.items.value" :begin="calendar.items.begin" @cancel="dateCancel" @change="dateOk" :end="calendar.items.end" :format="calendar.items.format" :single="calendar.items.single" :rangeValue='calendar.items.rangeValue' :autoClose='calendar.items.autoClose'>
+        <Calendar style="width:200px;margin:20px auto;" :value="calendar.items.value" :begin="calendar.items.begin" @close="dateClose" @change="dateOk" :end="calendar.items.end" :format="calendar.items.format" :single="calendar.items.single" :rangeValue='calendar.items.rangeValue' :autoClose='calendar.items.autoClose'>
         </Calendar>
 
         <div>
@@ -38,7 +38,7 @@ export default {
     watch: {
     },
     methods: {
-        dateCancel(obj) {
+        dateClose(obj) {
             this.calendar.show = obj.show;
         },
         dateOk(obj) {

@@ -373,7 +373,7 @@ not supported by any browser */
             <input type="text" :placeholder="placeholder" v-model='currentRangeValue'>
             <span class="fa fa-calendar calendar-picker-icon" aria-hidden="true"></span>
         </span>
-        <div class="calendar" v-show="show" :style="{'left':x+'px','top':y+'px'}" transition="calendar" transition-mode="out-in">
+        <div class="calendar" v-show="currentShow" :style="{'left':x+'px','top':y+'px'}" transition="calendar" transition-mode="out-in">
             <div class="calendar-tools">
                 <span class="calendar-operate-btns calendar-prev" @click="prev">
                     <i class="fa fa-angle-left"></i>
@@ -415,6 +415,11 @@ import moment from 'moment'
 export default {
     name: 'Calendar',
     props: {
+        //是否显示时间选择器
+        show: {
+            type: Boolean,
+            default: undefined
+        },
         //起始值
         value: {
             type: String,
@@ -512,7 +517,7 @@ export default {
     },
     data() {
         return {
-            show: false,
+            currentShow: this.show,
             x: 0,
             y: 0,
             currentValue: this.value,
@@ -552,8 +557,11 @@ export default {
         }, 500)
     },
     watch: {
-        show() {
-            this.init()
+        show(newVal) {
+            this.currentShow = newVal;
+        },
+        currentShow(newVal) {
+            this.init();
         },
         value(newVal) {
             this.currentValue = newVal;
@@ -569,13 +577,15 @@ export default {
         // 打开显示选择器
         open(e) {
             // 设置类型
-            this.show = true
+            this.$emit('open', { show: true });
+            //如果父组件没有绑定open自定义事件，则默认弹出。如果绑定了，则根据props.show进行显示or关闭
+            this.currentShow = this.$listeners.open === undefined || this.show === undefined ? true : this.show;
             this.x = e.currentTarget.offsetLeft
             this.y = e.currentTarget.offsetTop + e.currentTarget.offsetHeight + 8
         },
         // 初始化数据
         init() {
-            if (this.show) {
+            if (this.currentShow) {
                 if (!this.value) {
                     this.selectValue.start = new Date();
                 }
@@ -787,8 +797,8 @@ export default {
         },
         // 隐藏控件
         cancel() {
-            this.show = false;
-            this.$emit('cancel', { show: false });
+            this.currentShow = false;
+            this.$emit('close', { show: false });
         },
         //获取样式,cssClass为传过来的样式，如果有默认使用传递样式
         getCssClass(value, cssClass) {

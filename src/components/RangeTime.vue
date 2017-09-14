@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Calendar style="width:300px;margin:20px auto;" :value="calendar.items.value" :begin="calendar.items.begin" @cancel="dateCancel" @change="dateOk" :end="calendar.items.end" :format="calendar.items.format" :single="calendar.items.single" :rangeValue='calendar.items.rangeValue' :autoClose='calendar.items.autoClose'>
+        <Calendar style="width:300px;margin:20px auto;" :show="calendar.items.show" :value="calendar.items.value" :begin="calendar.items.begin" @open="dateOpen" @close="dateClose" @change="dateOk" :end="calendar.items.end" :format="calendar.items.format" :single="calendar.items.single" :rangeValue='calendar.items.rangeValue' :autoClose='calendar.items.autoClose'>
         </Calendar>
 
         <div>
@@ -22,6 +22,7 @@ export default {
             // 数据绑定
             calendar: {
                 items: {
+                    show: false,
                     begin: "2016-08-20",
                     end: moment().format('YYYY-MM-DD'),
                     value: "2017-03-08",
@@ -42,8 +43,11 @@ export default {
         }
     },
     methods: {
-        dateCancel(obj) {
-            this.calendar.show = obj.show;
+        dateOpen(obj) {
+            this.calendar.items.show = obj.show;
+        },
+        dateClose(obj) {
+            this.calendar.items.show = obj.show;
         },
         dateOk(obj) {
             this.calendar.items.value = obj.values[0];

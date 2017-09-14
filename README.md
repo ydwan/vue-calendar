@@ -17,6 +17,7 @@
 ## props参数：
 | Parameter | Type | Description |
 | --------| ------- | -------- |
+| show | Boolean | 默认可以不传。传入时手动控制是否显示时间选择器，需要搭配open事件使用。具体查看RangeTime.vue |
 | value | String | 视图渲染的时间值 |
 | rangeValue | String | 视图渲染的区间时间值(第二值) |
 | single | Boolean | 是否为单一选择器,默认为true |
@@ -30,8 +31,10 @@
 | weeksWording | Array | 用于顶部显示周的文案,默认weeksWording:['日', '一', '二', '三', '四', '五', '六'] |
 | monthsWording | Array | 用于顶部显示月份文案,monthsWording:[{ text: '一月', value: 0 }] |
 | format | String | 展示的日期格式，配置参考 moment.js |
+| change | Function({values}) | 勾选时间之后的回调函数，参数示例:{values:['2017-01-01','2017-02-01']} |
+| open | Function({show}) | 打开时间选择器的回调函数，show:true |
+| close | Function({show}) | 关闭时间选择器的回调函数，show:false |
 
-## 选择日期之后的参数传递：
-<p>由于<code>vue2.0</code>移除了<code>.sync</code>,所以需要<code>$emit</code>触发事件传递勾选的值给父组件</p>
-<p><code>ok</code>事件用于传递值给父组件,回调参数为<code>Array</code>类型,返回所有勾选的值</p>
-<p><code>cancel</code>取消时间,传递一个包含<code>show</code>的对象类型:<code>{show:false}</code></p>
+## 调用示例：
+<p><code><Calendar style="width:300px;margin:20px auto;" :value="calendar.items.value" :begin="calendar.items.begin" @close="dateClose" @change="dateOk" :end="calendar.items.end" :format="calendar.items.format" :single="calendar.items.single" :rangeValue='calendar.items.rangeValue' :autoClose='calendar.items.autoClose'>
+</Calendar></code></p>
