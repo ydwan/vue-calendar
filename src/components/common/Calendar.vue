@@ -362,7 +362,7 @@ not supported by any browser */
 </style>
 
 <template>
-    <div>
+    <div @click.stop="'防止冒泡点击关闭,勿删'">
         <span @click.stop="open($event)" class="calendar-form" v-if="single">
             <input type="text" :placeholder="placeholder" v-model='currentValue'>
             <span class="fa fa-calendar calendar-picker-icon" aria-hidden="true"></span>
@@ -396,7 +396,28 @@ not supported by any browser */
                 <tbody>
                     <tr v-for="(item,index) in list.body" :key="'body'+index">
                         <td v-for="td in item" @click.stop="select(td.value)" :class="getCssClass(td.value,td.cssClass)" :key="td.value">
-                            <span>{{td.text}}</span>
+                            <!--区间选择的td样式-->
+                            <div v-if="!single" style="position: relative;">
+                                <div v-if="selects.length==1||(selects.indexOf(td.value)!=0&&selects.indexOf(td.value)!=selects.length-1)">
+                                    <span>{{td.text}}</span>
+                                </div>
+                                <div v-else-if="selects.indexOf(td.value)==0">
+                                    <div style="font-size:12px;position: absolute;left:2px;top:0px;color:#fff">
+                                      <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                                    </div>
+                                    <span>{{td.text}}</span>
+                                </div>
+                                <div v-else-if="selects.indexOf(td.value)==selects.length-1">
+                                    <div style="font-size:12px;position: absolute;right:2px;top:0px;color:#fff">
+                                      <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                                    </div>
+                                    <span>{{td.text}}</span>
+                                </div>
+                            </div>
+                            <!--单一时间的td样式-->
+                            <div v-else>
+                                <span>{{td.text}}</span>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -1071,20 +1092,20 @@ var getMonthDateBody = function(date) {
 
     var monthStartDay = mm.startOf("month").days();
     var monthEndDay = mm.endOf("month").days();
-    //如果每个月第一天不是星期天,则补全当前行
-    if (monthStartDay != 0) {
-        var prevMM = moment(new Date(date)).add(-1, 'months');
-        var prevPadding = prevMM.endOf("month").add(0 - monthStartDay, "days");
-        for (var i = 0; i <= monthStartDay - 1; i++) {
-            result.push({
-                text: prevPadding.add(1, "days").format("DD"),
-                value: prevPadding.add(0, "days").format("YYYY-MM-DD"),
-                cssClass: {
-                    "old": true
-                }
-            })
-        }
+    //如果当前月的第一天是星期天，那么我们需要在它前面加上上个月最后一周的时间
+    if (monthStartDay == 0) monthStartDay = 7;
+    var prevMM = moment(new Date(date)).add(-1, 'months');
+    var prevPadding = prevMM.endOf("month").add(0 - monthStartDay, "days");
+    for (var i = 0; i <= monthStartDay - 1; i++) {
+        result.push({
+            text: prevPadding.add(1, "days").format("DD"),
+            value: prevPadding.add(0, "days").format("YYYY-MM-DD"),
+            cssClass: {
+                "old": true
+            }
+        })
     }
+
     //获取当前日期月份最后一天号数
     var thisMonthLastNum = Number(moment(new Date(date)).endOf("month").format("DD"));
     for (var i = 0; i <= thisMonthLastNum - 1; i++) {
@@ -1101,6 +1122,19 @@ var getMonthDateBody = function(date) {
             result.push({
                 text: moment(new Date(date)).startOf("month").add(1, 'months').add(i, "days").format("DD"),
                 value: moment(new Date(date)).startOf("month").add(1, 'months').add(i, "days").format("YYYY-MM-DD"),
+                cssClass: {
+                    "old": true
+                }
+            })
+        }
+    }
+    //如果少于42个日期，也就是少于6周时，补全最后一周的日期（补全为6行数据）
+    if (result.length == 35 && result.length < 42) {
+        var theLastDay = result[result.length - 1].value;
+        for (var i = 0; i < 7; i++) {
+            result.push({
+                text: moment(new Date(theLastDay)).startOf("month").add(1, 'months').add(i, "days").format("DD"),
+                value: moment(new Date(theLastDay)).startOf("month").add(1, 'months').add(i, "days").format("YYYY-MM-DD"),
                 cssClass: {
                     "old": true
                 }
