@@ -279,7 +279,7 @@ not supported by any browser */
 .calendar-form {
     position: relative;
     display: inline-block;
-    padding: 4px 7px;
+    /* padding: 4px 7px; */
     width: 100%;
     height: 28px;
     color: rgba(0, 0, 0, .65);
